@@ -33,8 +33,7 @@
       ],
       "css": [
         "styles/content.css",
-        "src/content/ui/floating-badge.css",
-        "src/content/ui/quick-reply.css"
+        "src/content/ui/floating-badge.css"
       ],
       "run_at": "document_idle",
       "world": "ISOLATED"
