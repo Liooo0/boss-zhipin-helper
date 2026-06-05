@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "BOSS直聘助手",
+    "description": "Extension name"
+  },
+  "appDescription": {
+    "message": "辅助沟通、消息分类与求职追踪 — 模板填充、快捷回复、数据统计",
+    "description": "Extension description"
+  },
+  "defaultTitle": {
+    "message": "BOSS直聘助手",
+    "description": "Default title for browser action"
+  }
+}

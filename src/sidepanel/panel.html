@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOSS直聘助手 - 数据面板</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <div class="dashboard">
+    <!-- 头部 -->
+    <header class="dashboard-header">
+      <h1>📊 求职数据分析</h1>
+      <div class="header-actions">
+        <button id="btn-refresh" class="icon-btn" title="刷新数据">🔄</button>
+        <button id="btn-export" class="btn btn-small">导出数据</button>
+      </div>
+    </header>
+
+    <!-- 概览卡片 -->
+    <section class="overview-cards">
+      <div class="overview-card">
+        <div class="card-icon">📮</div>
+        <div class="card-data">
+          <div class="card-value" id="ov-total-apps">--</div>
+          <div class="card-label">总投递数</div>
+        </div>
+      </div>
+      <div class="overview-card accent-green">
+        <div class="card-icon">💬</div>
+        <div class="card-data">
+          <div class="card-value" id="ov-response-rate">--%</div>
+          <div class="card-label">回复率</div>
+        </div>
+      </div>
+      <div class="overview-card accent-orange">
+        <div class="card-icon">📅</div>
+        <div class="card-data">
+          <div class="card-value" id="ov-interviews">--</div>
+          <div class="card-label">面试邀请</div>
+        </div>
+      </div>
+      <div class="overview-card accent-blue">
+        <div class="card-icon">📈</div>
+        <div class="card-data">
+          <div class="card-value" id="ov-interview-rate">--%</div>
+          <div class="card-label">面试转化率</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 趋势图 -->
+    <section class="chart-section">
+      <h2>📈 投递趋势（近30天）</h2>
+      <div class="chart-container">
+        <canvas id="trend-chart" width="600" height="200"></canvas>
+      </div>
+    </section>
+
+    <!-- Tab 切换 -->
+    <section class="tab-section">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="applications">投递记录</button>
+        <button class="tab-btn" data-tab="conversations">沟通记录</button>
+      </div>
+    </section>
+
+    <!-- 投递记录列表 -->
+    <section class="list-section" id="tab-applications">
+      <div class="list-controls">
+        <select id="filter-status">
+          <option value="all">全部状态</option>
+          <option value="sent">已投递</option>
+          <option value="replied">已回复</option>
+          <option value="interview">面试中</option>
+          <option value="rejected">不合适</option>
+        </select>
+        <input type="text" id="filter-search" placeholder="搜索公司/职位..." />
+      </div>
+      <div class="list-container" id="applications-list">
+        <div class="empty-state">暂无投递记录</div>
+      </div>
+    </section>
+
+    <!-- 沟通记录列表 -->
+    <section class="list-section hidden" id="tab-conversations">
+      <div class="list-container" id="conversations-list">
+        <div class="empty-state">暂无沟通记录</div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="panel.js"></script>
+</body>
+</html>

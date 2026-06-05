@@ -1,0 +1,95 @@
+/* ============================================================
+   content.css — 注入到 BOSS 直聘页面的样式
+   所有注入元素使用 boss-helper 前缀避免冲突
+   ============================================================ */
+
+/* 已沟通徽章 */
+.boss-helper-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  background: rgba(82, 196, 26, 0.92);
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 1.5;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  animation: boss-helper-fade-in 0.3s ease-out;
+}
+
+/* 已投递徽章变体 */
+.boss-helper-badge.applied {
+  background: rgba(24, 144, 255, 0.92);
+}
+
+.boss-helper-badge.replied {
+  background: rgba(250, 173, 20, 0.92);
+}
+
+.boss-helper-badge.interview {
+  background: rgba(82, 196, 26, 0.92);
+}
+
+/* 快捷回复面板容器 */
+#boss-helper-reply-panel {
+  animation: boss-helper-fade-in 0.25s ease-out;
+}
+
+/* 消息分类标签 */
+.boss-helper-msg-tag {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.boss-helper-msg-tag.ask_resume {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.boss-helper-msg-tag.ask_interview {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.boss-helper-msg-tag.ask_salary {
+  background: #fffbe6;
+  color: #faad14;
+}
+
+.boss-helper-msg-tag.spam {
+  background: #fff2f0;
+  color: #ff4d4f;
+}
+
+/* 动画 */
+@keyframes boss-helper-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes boss-helper-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
