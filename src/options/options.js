@@ -116,7 +116,7 @@ async function parseResume(file) {
     }
 
     // 3. 调用 DeepSeek 提取结构化信息
-    const structured = await callDeepSeekForResume(text, apiKey);
+    const structured = await callDeepSeekForResume(text, apiKey, provider);
     if (!structured) {
       status.textContent = '❌ AI 提取失败';
       return;
@@ -166,8 +166,7 @@ async function extractPdfText(arrayBuf) {
   return pages.join('\n--- 分页 ---\n');
 }
 
-async function callDeepSeekForResume(resumeText, apiKey) {
-  // 截断到 8000 字以内
+async function callDeepSeekForResume(resumeText, apiKey, provider = 'deepseek') {
   const text = resumeText.length > 8000 ? resumeText.substring(0, 8000) : resumeText;
 
   const endpoint = provider === 'mimo' ? 'https://api.xiaomimimo.com/v1/chat/completions' : 'https://api.deepseek.com/chat/completions';
