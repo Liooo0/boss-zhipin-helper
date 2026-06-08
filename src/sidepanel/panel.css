@@ -1,6 +1,24 @@
 /* ============================================================
-   panel.css — 侧边栏仪表盘样式
+   panel.css — BOSS直聘助手仪表盘样式
+   Design: Glassmorphism + Aurora background + Neumorphic tabs
+   Inspired by Uiverse Galaxy
    ============================================================ */
+
+/* === CSS Variables === */
+:root {
+  --accent-start: #667eea;
+  --accent-end: #764ba2;
+  --accent-green: #52c41a;
+  --accent-orange: #fa8c16;
+  --accent-purple: #722ed1;
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.06);
+  --shadow-card: 4px 4px 16px rgba(0, 0, 0, 0.04), -4px -4px 16px #fff;
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-blur: 16px;
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
 * {
   margin: 0;
@@ -12,9 +30,13 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 14px;
-  color: #333;
-  background: #f5f6f8;
+  color: #2c3e50;
   min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(102, 126, 234, 0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 30%, rgba(118, 75, 162, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(102, 126, 234, 0.03) 0%, transparent 40%),
+    linear-gradient(180deg, #f0f2ff 0%, #f8f9fc 30%, #f5f3f8 100%);
 }
 
 .dashboard {
@@ -23,17 +45,29 @@ body {
   padding: 20px;
 }
 
-/* Header */
+/* ==================== Header ==================== */
+
 .dashboard-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-soft);
 }
 
 .dashboard-header h1 {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .header-actions {
@@ -41,138 +75,291 @@ body {
   gap: 8px;
 }
 
-/* Buttons */
+/* ==================== Buttons ==================== */
+
 .btn {
   padding: 8px 16px;
-  border: 1px solid #d9d9d9;
-  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
   font-size: 13px;
   cursor: pointer;
-  background: #fff;
   font-family: inherit;
-  transition: all 0.2s;
+  font-weight: 500;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #5a5a72;
 }
 
 .btn:hover {
-  border-color: #1890ff;
-  color: #1890ff;
+  border-color: rgba(102, 126, 234, 0.3);
+  color: #667eea;
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .btn-primary {
-  background: #1890ff;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: #fff;
-  border-color: #1890ff;
+  border: none;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  color: #fff;
 }
 
 .btn-small {
-  padding: 4px 10px;
+  padding: 5px 12px;
   font-size: 12px;
+  border-radius: 8px;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
-  border: 1px solid #d9d9d9;
-  border-radius: 6px;
-  background: #fff;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   cursor: pointer;
   font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: var(--transition-smooth);
 }
 
-/* Overview Cards */
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: rotate(30deg);
+  color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+/* ==================== Overview Cards — Glass with Gradient Top Border ==================== */
+
 .overview-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 14px;
+  margin-bottom: 24px;
 }
 
 .overview-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 16px;
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: 16px;
+  padding: 18px 16px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  border: 1px solid #eee;
-  border-left: 4px solid #1890ff;
+  gap: 14px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-smooth);
+  overflow: hidden;
 }
 
-.overview-card.accent-green { border-left-color: #52c41a; }
-.overview-card.accent-orange { border-left-color: #faad14; }
-.overview-card.accent-blue { border-left-color: #722ed1; }
+/* Gradient top accent line */
+.overview-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  width: 60%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #667eea, transparent);
+  border-radius: 0 0 3px 3px;
+  transition: var(--transition-smooth);
+  opacity: 0.7;
+}
 
+.overview-card.accent-green::before {
+  background: linear-gradient(90deg, transparent, #52c41a, transparent);
+}
+.overview-card.accent-orange::before {
+  background: linear-gradient(90deg, transparent, #fa8c16, transparent);
+}
+.overview-card.accent-blue::before {
+  background: linear-gradient(90deg, transparent, #722ed1, transparent);
+}
+
+/* Hover — lift effect */
+.overview-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.08), -4px -4px 16px #fff;
+  border-color: rgba(102, 126, 234, 0.2);
+}
+
+.overview-card:hover::before {
+  left: 10%;
+  width: 80%;
+  opacity: 1;
+}
+
+/* Card icon background glow */
 .card-icon {
-  font-size: 28px;
+  font-size: 30px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: rgba(102, 126, 234, 0.08);
+  flex-shrink: 0;
+  transition: var(--transition-smooth);
+}
+
+.overview-card.accent-green .card-icon { background: rgba(82, 196, 26, 0.08); }
+.overview-card.accent-orange .card-icon { background: rgba(250, 140, 22, 0.08); }
+.overview-card.accent-blue .card-icon { background: rgba(114, 46, 209, 0.08); }
+
+.overview-card:hover .card-icon {
+  transform: scale(1.1);
 }
 
 .card-value {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+  transition: var(--transition-bounce);
+}
+
+.overview-card.accent-green .card-value {
+  background: linear-gradient(135deg, #52c41a, #389e0d);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.overview-card.accent-orange .card-value {
+  background: linear-gradient(135deg, #fa8c16, #d46b08);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.overview-card.accent-blue .card-value {
+  background: linear-gradient(135deg, #722ed1, #531dab);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.overview-card:hover .card-value {
+  transform: scale(1.06);
 }
 
 .card-label {
   font-size: 12px;
-  color: #999;
+  color: #8e8ea0;
+  font-weight: 500;
+  margin-top: 2px;
 }
 
-/* Chart */
+/* ==================== Chart Section — Glass Container ==================== */
+
 .chart-section {
-  background: #fff;
-  border-radius: 12px;
-  padding: 16px;
-  border: 1px solid #eee;
-  margin-bottom: 20px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 24px;
 }
 
 .chart-section h2 {
   font-size: 15px;
-  font-weight: 500;
-  margin-bottom: 12px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  color: #3a3a52;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .chart-container {
   overflow-x: auto;
+  border-radius: 10px;
+  padding: 4px;
 }
 
 .chart-container canvas {
   width: 100%;
+  border-radius: 8px;
 }
 
-/* Tabs */
+/* ==================== Tabs — Neumorphic Pills ==================== */
+
+.tab-section {
+  margin-bottom: 0;
+}
+
 .tabs {
   display: flex;
-  gap: 0;
-  margin-bottom: -1px;
+  gap: 6px;
+  margin-bottom: 0;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 14px;
+  display: inline-flex;
 }
 
 .tab-btn {
-  padding: 10px 20px;
-  border: 1px solid #d9d9d9;
-  background: #fafafa;
+  padding: 9px 22px;
+  border: none;
+  background: transparent;
   cursor: pointer;
   font-size: 13px;
   font-family: inherit;
-  border-radius: 6px 6px 0 0;
+  font-weight: 500;
+  border-radius: 11px;
+  color: #8e8ea0;
+  transition: var(--transition-smooth);
+  position: relative;
+}
+
+.tab-btn:hover {
+  color: #5a5a72;
 }
 
 .tab-btn.active {
-  background: #fff;
-  border-bottom-color: #fff;
-  color: #1890ff;
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.8);
+  color: #667eea;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-/* List Controls */
+/* ==================== List Section — Glass Container ==================== */
+
 .list-section {
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 0 8px 8px 8px;
-  padding: 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-top: 12px;
   min-height: 200px;
+  box-shadow: var(--shadow-soft);
 }
 
 .list-section.hidden {
@@ -181,24 +368,38 @@ body {
 
 .list-controls {
   display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .list-controls select,
 .list-controls input {
-  padding: 6px 12px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
+  padding: 8px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
   font-size: 13px;
   font-family: inherit;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: var(--transition-smooth);
+  color: #3a3a52;
+  outline: none;
+}
+
+.list-controls select:focus,
+.list-controls input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .list-controls input {
   flex: 1;
 }
 
-/* List Items */
+/* ==================== List Items — Modern Design ==================== */
+
 .list-container {
   max-height: 400px;
   overflow-y: auto;
@@ -206,21 +407,49 @@ body {
 
 .empty-state {
   text-align: center;
-  padding: 40px;
-  color: #999;
+  padding: 50px 20px;
+  color: #b0b0c0;
+  font-size: 14px;
 }
 
 .list-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background 0.15s;
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid transparent;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.list-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 25%;
+  height: 50%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, #667eea, #764ba2);
+  transform: scaleY(0);
+  transition: var(--transition-smooth);
+  opacity: 0;
 }
 
 .list-item:hover {
-  background: #fafafa;
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(102, 126, 234, 0.15);
+  transform: translateX(2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.list-item:hover::before {
+  transform: scaleY(1);
+  opacity: 1;
 }
 
 .list-item:last-child {
@@ -229,42 +458,107 @@ body {
 
 .item-main {
   flex: 1;
+  min-width: 0;
 }
 
 .item-title {
-  font-weight: 500;
-  margin-bottom: 2px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  color: #2c3e50;
+  font-size: 14px;
 }
 
 .item-sub {
   font-size: 12px;
-  color: #999;
+  color: #8e8ea0;
 }
+
+/* ==================== Status Badges — Glass Capsules ==================== */
 
 .item-status {
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-weight: 500;
+  font-size: 11px;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
-.status-sent { background: #f5f5f5; color: #666; }
-.status-replied { background: #e6f7ff; color: #1890ff; }
-.status-interview { background: #f6ffed; color: #52c41a; }
-.status-rejected { background: #fff2f0; color: #ff4d4f; }
-.status-active { background: #e6f7ff; color: #1890ff; }
-.status-archived { background: #f5f5f5; color: #999; }
+.status-sent {
+  background: rgba(0, 0, 0, 0.04);
+  color: #666;
+}
+.status-replied {
+  background: rgba(24, 144, 255, 0.1);
+  color: #1677cc;
+}
+.status-interview {
+  background: rgba(82, 196, 26, 0.1);
+  color: #389e0d;
+}
+.status-rejected {
+  background: rgba(255, 77, 79, 0.08);
+  color: #cf1322;
+}
+.status-active {
+  background: rgba(24, 144, 255, 0.1);
+  color: #1677cc;
+}
+.status-archived {
+  background: rgba(0, 0, 0, 0.04);
+  color: #999;
+}
 
 .item-time {
-  font-size: 12px;
-  color: #999;
-  min-width: 60px;
+  font-size: 11px;
+  color: #b0b0c0;
+  min-width: 70px;
   text-align: right;
+  flex-shrink: 0;
 }
 
-/* Responsive */
+/* ==================== Staggered Entrance Animations ==================== */
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.overview-card:nth-child(1) { animation: card-enter 0.45s 0.05s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.overview-card:nth-child(2) { animation: card-enter 0.45s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.overview-card:nth-child(3) { animation: card-enter 0.45s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.overview-card:nth-child(4) { animation: card-enter 0.45s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+.chart-section { animation: fade-in-up 0.5s 0.25s ease both; }
+.list-section { animation: fade-in-up 0.4s 0.3s ease both; }
+
+/* ==================== Responsive ==================== */
+
 @media (max-width: 640px) {
   .overview-cards {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .dashboard {
+    padding: 12px;
+  }
+  .overview-card {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+  .card-value {
+    font-size: 20px;
   }
 }

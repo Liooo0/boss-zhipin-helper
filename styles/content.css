@@ -1,81 +1,140 @@
 /* ============================================================
    content.css — 注入到 BOSS 直聘页面的样式
+   Design: Glass badges + Spring animations
+   Inspired by Uiverse Galaxy
    所有注入元素使用 boss-helper 前缀避免冲突
    ============================================================ */
 
-/* 已沟通徽章 */
+/* ==================== Glass Badge — 已沟通标记 ==================== */
+
 .boss-helper-badge {
   position: absolute;
   top: 8px;
   right: 8px;
   z-index: 10;
-  background: rgba(82, 196, 26, 0.92);
+  background: rgba(82, 196, 26, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #fff;
   font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 3px 10px;
+  border-radius: 8px;
   pointer-events: none;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
     "Microsoft YaHei", sans-serif;
+  font-weight: 600;
   letter-spacing: 0.5px;
   line-height: 1.5;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-  animation: boss-helper-fade-in 0.3s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 2px 8px rgba(82, 196, 26, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  animation: bh-glass-pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-/* 已投递徽章变体 */
+/* Glass badge variants */
 .boss-helper-badge.applied {
-  background: rgba(24, 144, 255, 0.92);
+  background: rgba(24, 144, 255, 0.8);
+  box-shadow:
+    0 2px 8px rgba(24, 144, 255, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
 }
 
 .boss-helper-badge.replied {
-  background: rgba(250, 173, 20, 0.92);
+  background: rgba(250, 173, 20, 0.8);
+  box-shadow:
+    0 2px 8px rgba(250, 173, 20, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
 }
 
 .boss-helper-badge.interview {
-  background: rgba(82, 196, 26, 0.92);
+  background: rgba(82, 196, 26, 0.8);
+  box-shadow:
+    0 2px 8px rgba(82, 196, 26, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
 }
 
-/* 快捷回复面板容器 */
+/* ==================== Quick Reply Panel Container ==================== */
+
 #boss-helper-reply-panel {
-  animation: boss-helper-fade-in 0.25s ease-out;
+  animation: bh-glass-slide-up 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* 消息分类标签 */
+/* ==================== Message Classification Tags — Glass Capsules ==================== */
+
 .boss-helper-msg-tag {
   display: inline-block;
   font-size: 10px;
-  padding: 1px 6px;
-  border-radius: 8px;
+  padding: 2px 8px;
+  border-radius: 10px;
   margin-left: 4px;
   vertical-align: middle;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  animation: bh-glass-fade-in 0.25s ease both;
 }
 
 .boss-helper-msg-tag.ask_resume {
-  background: #e6f7ff;
-  color: #1890ff;
+  background: rgba(24, 144, 255, 0.12);
+  color: #1677cc;
+  border-color: rgba(24, 144, 255, 0.2);
 }
 
 .boss-helper-msg-tag.ask_interview {
-  background: #f6ffed;
-  color: #52c41a;
+  background: rgba(82, 196, 26, 0.12);
+  color: #389e0d;
+  border-color: rgba(82, 196, 26, 0.2);
 }
 
 .boss-helper-msg-tag.ask_salary {
-  background: #fffbe6;
-  color: #faad14;
+  background: rgba(250, 173, 20, 0.12);
+  color: #d48806;
+  border-color: rgba(250, 173, 20, 0.2);
 }
 
 .boss-helper-msg-tag.spam {
-  background: #fff2f0;
-  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.1);
+  color: #cf1322;
+  border-color: rgba(255, 77, 79, 0.18);
 }
 
-/* 动画 */
-@keyframes boss-helper-fade-in {
+/* ==================== Animations ==================== */
+
+/* Spring pop-in for badges */
+@keyframes bh-glass-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(-6px);
+  }
+  60% {
+    transform: scale(1.08) translateY(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Slide up with bounce for panels */
+@keyframes bh-glass-slide-up {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Smooth fade in */
+@keyframes bh-glass-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -83,13 +142,25 @@
   }
 }
 
-@keyframes boss-helper-slide-in {
+/* Slide in from right */
+@keyframes bh-glass-slide-in {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(16px);
   }
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+/* ==================== Utility: Pulse glow for attention ==================== */
+
+@keyframes bh-glass-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(102, 126, 234, 0);
   }
 }

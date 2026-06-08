@@ -8,16 +8,16 @@
 </head>
 <body>
   <div class="dashboard">
-    <!-- 头部 -->
+    <!-- 头部 — Glass card -->
     <header class="dashboard-header">
       <h1>📊 求职数据分析</h1>
       <div class="header-actions">
         <button id="btn-refresh" class="icon-btn" title="刷新数据">🔄</button>
-        <button id="btn-export" class="btn btn-small">导出数据</button>
+        <button id="btn-export" class="btn btn-small">📥 导出数据</button>
       </div>
     </header>
 
-    <!-- 概览卡片 -->
+    <!-- 概览卡片 — Glass cards with gradient top border -->
     <section class="overview-cards">
       <div class="overview-card">
         <div class="card-icon">📮</div>
@@ -49,7 +49,7 @@
       </div>
     </section>
 
-    <!-- 趋势图 -->
+    <!-- 趋势图 — Glass container -->
     <section class="chart-section">
       <h2>📈 投递趋势（近30天）</h2>
       <div class="chart-container">
@@ -57,15 +57,15 @@
       </div>
     </section>
 
-    <!-- Tab 切换 -->
+    <!-- Tab 切换 — Neumorphic pills -->
     <section class="tab-section">
       <div class="tabs">
-        <button class="tab-btn active" data-tab="applications">投递记录</button>
-        <button class="tab-btn" data-tab="conversations">沟通记录</button>
+        <button class="tab-btn active" data-tab="applications">📋 投递记录</button>
+        <button class="tab-btn" data-tab="conversations">💬 沟通记录</button>
       </div>
     </section>
 
-    <!-- 投递记录列表 -->
+    <!-- 投递记录列表 — Glass container -->
     <section class="list-section" id="tab-applications">
       <div class="list-controls">
         <select id="filter-status">
@@ -75,14 +75,14 @@
           <option value="interview">面试中</option>
           <option value="rejected">不合适</option>
         </select>
-        <input type="text" id="filter-search" placeholder="搜索公司/职位..." />
+        <input type="text" id="filter-search" placeholder="🔍 搜索公司/职位..." />
       </div>
       <div class="list-container" id="applications-list">
         <div class="empty-state">暂无投递记录</div>
       </div>
     </section>
 
-    <!-- 沟通记录列表 -->
+    <!-- 沟通记录列表 — Glass container -->
     <section class="list-section hidden" id="tab-conversations">
       <div class="list-container" id="conversations-list">
         <div class="empty-state">暂无沟通记录</div>

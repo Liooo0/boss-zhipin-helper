@@ -8,8 +8,9 @@
 </head>
 <body>
   <div class="options-container">
+    <!-- 侧边栏 — Glass panel -->
     <aside class="sidebar">
-      <h2 class="sidebar-title">⚙️ 设置</h2>
+      <h2 class="sidebar-title">✦ 设置</h2>
       <nav>
         <a href="#" class="nav-item active" data-section="profile">👤 个人信息</a>
         <a href="#" class="nav-item" data-section="data">💾 数据管理</a>
@@ -22,14 +23,15 @@
       <section id="section-profile" class="content-section active">
         <h3>📄 简历上传</h3>
         <p class="help-text">上传 PDF 简历，AI 自动提取信息。识别结果可在弹窗中编辑。</p>
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
           <input type="file" id="resume-file" accept=".pdf" hidden />
           <button id="btn-upload-resume" class="btn btn-primary">📤 上传 PDF 简历</button>
           <button id="btn-view-resume" class="btn" style="display:none;">📋 查看/编辑识别结果</button>
-          <span id="resume-status" style="font-size:12px;color:#999;"></span>
+          <span id="resume-status" style="font-size:12px;color:#8e8ea0;"></span>
         </div>
         <div class="form-divider"></div>
-        <h3>个人信息设置</h3>
+
+        <h3>👤 个人信息设置</h3>
         <p class="help-text">可手动填写，上传简历后也可从识别结果中获取。</p>
         <div class="form-group">
           <label>姓名/昵称 <span class="var-tag">{{userName}}</span></label>
@@ -47,36 +49,37 @@
           <label>期望薪资 <span class="var-tag">{{expectedSalary}}</span></label>
           <input type="text" id="setting-expectedSalary" placeholder="例如：15K-20K" />
         </div>
-        <h3 style="margin-top:16px;">🤖 AI 设置</h3>
+
+        <h3 style="margin-top:24px;">🤖 AI 设置</h3>
         <div class="form-group">
           <label>默认 AI 模型</label>
-          <select id="setting-ai-provider" style="width:100%;padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;">
+          <select id="setting-ai-provider">
             <option value="deepseek">DeepSeek (api.deepseek.com)</option>
             <option value="mimo">MiMo 2.5 (小米 · api.xiaomimimo.com)</option>
           </select>
         </div>
         <div class="form-group">
           <label>AI 回复风格</label>
-          <select id="setting-reply-mode" style="width:100%;padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;">
+          <select id="setting-reply-mode">
             <option value="professional">💼 专业模式 — 简洁专业，商务克制</option>
             <option value="human">😊 拟人模式 — 口语自然，像真人聊天</option>
           </select>
         </div>
         <div class="form-group">
           <label>DeepSeek API Key</label>
-          <input type="password" id="setting-deepseek-key" placeholder="sk-xxxxxxxxxxxxxxxx" style="font-family:monospace;" />
-          <p class="help-text" style="margin-top:2px;"><a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com</a></p>
+          <input type="password" id="setting-deepseek-key" placeholder="sk-xxxxxxxxxxxxxxxx" />
+          <p class="help-text" style="margin-top:4px;"><a href="https://platform.deepseek.com/api_keys" target="_blank">获取 Key: platform.deepseek.com</a></p>
         </div>
         <div class="form-group">
-          <label>MIMO 2.5 API Key</label>
-          <input type="password" id="setting-mimo-key" placeholder="输入 MIMO API Key" style="font-family:monospace;" />
+          <label>MiMo 2.5 API Key</label>
+          <input type="password" id="setting-mimo-key" placeholder="输入 MIMO API Key" />
         </div>
-        <button id="btn-save-profile" class="btn btn-primary">保存设置</button>
+        <button id="btn-save-profile" class="btn btn-primary">💾 保存设置</button>
       </section>
 
       <!-- 数据管理 -->
       <section id="section-data" class="content-section">
-        <h3>数据管理</h3>
+        <h3>💾 数据管理</h3>
         <div class="data-actions">
           <div class="data-card">
             <h4>📤 导出数据</h4>
@@ -96,15 +99,15 @@
           </div>
           <div class="data-card">
             <h4>💾 存储设置</h4>
-            <div class="form-group" style="margin-bottom:8px;">
+            <div class="form-group">
               <label>最大保存岗位数</label>
-              <input type="number" id="setting-max-jobs" min="5" max="200" placeholder="30" style="width:100%;" />
+              <input type="number" id="setting-max-jobs" min="5" max="200" placeholder="30" />
             </div>
             <div class="form-group">
               <label>最大 AI 对话历史</label>
-              <input type="number" id="setting-max-ai-history" min="5" max="500" placeholder="50" style="width:100%;" />
+              <input type="number" id="setting-max-ai-history" min="5" max="500" placeholder="50" />
             </div>
-            <p class="help-text">置顶（📌）记录不会被自动清理</p>
+            <p class="help-text" style="margin-bottom:0;">置顶（📌）记录不会被自动清理</p>
           </div>
           <div class="data-card">
             <h4>📊 存储空间</h4>
@@ -115,13 +118,13 @@
 
       <!-- 关于 -->
       <section id="section-about" class="content-section">
-        <h3>关于</h3>
+        <h3>ℹ️ 关于</h3>
         <div class="about-content">
           <p>一个浏览器扩展，帮你在 BOSS 直聘上整理求职信息。</p>
           <p>数据存本地，你需要自己配置 DeepSeek API Key 才能用 AI 功能。</p>
           <p>不会替你发消息，所有操作你自己手动确认。</p>
-          <p style="margin-top:16px;color:#999;font-size:12px;">仅供学习参考，若违规使用后果自行承担。</p>
-          <p class="version-text">Version 1.0.0</p>
+          <p style="margin-top:16px;color:#8e8ea0;font-size:12px;">仅供学习参考，若违规使用后果自行承担。</p>
+          <p class="version-text">✦ Version 1.0.0</p>
         </div>
       </section>
     </main>

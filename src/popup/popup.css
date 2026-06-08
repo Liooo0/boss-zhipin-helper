@@ -1,6 +1,24 @@
 /* ============================================================
-   popup.css — 工具栏弹窗样式
+   popup.css — BOSS直聘助手弹窗样式
+   Design: Glassmorphism + Neumorphism + Creative Toggles
+   Inspired by Uiverse Galaxy
    ============================================================ */
+
+/* === CSS Variables === */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-blur: 16px;
+  --accent-start: #667eea;
+  --accent-end: #764ba2;
+  --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-card: 4px 4px 12px rgba(0, 0, 0, 0.05), -4px -4px 12px #fff;
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
 * {
   margin: 0;
@@ -12,50 +30,107 @@ body {
   width: 320px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
-  font-size: 14px;
-  color: #333;
-  background: #f8f9fa;
+  font-size: 13px;
+  color: #2c3e50;
+  background:
+    radial-gradient(ellipse at 30% 0%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(118, 75, 162, 0.06) 0%, transparent 50%),
+    linear-gradient(180deg, #f0f2ff 0%, #f8f9fc 40%, #f5f3f8 100%);
+  overflow: hidden;
 }
 
 .popup-container {
   padding: 0;
 }
 
-/* Header */
+/* ==================== Header — Glassmorphism ==================== */
+
 .popup-header {
-  background: linear-gradient(135deg, #1890ff, #096dd9);
+  position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #5b3cc4 100%);
   color: #fff;
-  padding: 16px;
+  padding: 18px 16px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  overflow: hidden;
+}
+
+/* Header aurora glow */
+.popup-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle at 30% 60%, rgba(255, 255, 255, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 35%);
+  pointer-events: none;
+  animation: header-shimmer 6s ease-in-out infinite;
+}
+
+@keyframes header-shimmer {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-2%, -1%); }
+}
+
+/* Header bottom glow border */
+.popup-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  pointer-events: none;
 }
 
 .popup-title {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
 
 .popup-version {
-  font-size: 11px;
-  opacity: 0.7;
+  font-size: 10px;
+  opacity: 0.65;
+  position: relative;
+  z-index: 1;
+  background: rgba(255,255,255,0.15);
+  padding: 2px 8px;
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
-/* Sections */
+/* ==================== Sections ==================== */
+
 section {
   padding: 12px 16px;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+section:last-of-type {
+  border-bottom: none;
 }
 
 .section-title {
-  font-size: 12px;
-  font-weight: 500;
-  color: #999;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8e8ea0;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  letter-spacing: 1.2px;
+  margin-bottom: 10px;
 }
 
-/* Stats Grid */
+/* ==================== Stats Grid — Neumorphism Cards ==================== */
+
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -63,61 +138,121 @@ section {
 }
 
 .stat-card {
-  background: #fff;
-  border-radius: 8px;
-  padding: 10px 6px;
+  position: relative;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: var(--radius-md);
+  padding: 12px 6px;
   text-align: center;
-  border: 1px solid #f0f0f0;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-smooth);
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 25%;
+  width: 50%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.4), transparent);
+  border-radius: 0 0 50% 50%;
+  transition: var(--transition-smooth);
+  opacity: 0;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 2px 8px 20px rgba(102, 126, 234, 0.1), -4px -4px 12px #fff;
+}
+
+.stat-card:hover::before {
+  opacity: 1;
 }
 
 .stat-value {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1890ff;
+  font-size: 20px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   line-height: 1.2;
+  transition: var(--transition-bounce);
+}
+
+.stat-card:hover .stat-value {
+  transform: scale(1.08);
 }
 
 .stat-label {
-  font-size: 11px;
-  color: #999;
-  margin-top: 2px;
+  font-size: 10px;
+  color: #8e8ea0;
+  font-weight: 500;
+  margin-top: 3px;
+  letter-spacing: 0.3px;
 }
 
-/* Weekly Row */
+/* ==================== Weekly Row ==================== */
+
 .weekly-row {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
-  color: #666;
+  color: #5a5a72;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 .weekly-row strong {
-  color: #333;
+  color: #667eea;
+  font-weight: 700;
 }
 
-/* Toggles */
+/* ==================== Toggles — Creative Design ==================== */
+
 .toggle-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #f5f5f5;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: var(--transition-smooth);
 }
 
 .toggle-row:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.toggle-row:hover {
+  background: rgba(255, 255, 255, 0.65);
+  border-color: rgba(102, 126, 234, 0.2);
 }
 
 .toggle-row span {
   font-size: 13px;
+  font-weight: 500;
+  color: #3a3a52;
 }
 
-/* Switch */
+/* Creative Toggle Switch */
 .switch {
   position: relative;
   display: inline-block;
-  width: 40px;
-  height: 22px;
+  width: 46px;
+  height: 26px;
 }
 
 .switch input {
@@ -133,66 +268,149 @@ section {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
-  transition: 0.2s;
-  border-radius: 22px;
+  background: #d4d4dc;
+  transition: var(--transition-bounce);
+  border-radius: 26px;
+  box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -1px -1px 2px rgba(255,255,255,0.6);
 }
 
-.slider:before {
+.slider::before {
   position: absolute;
   content: "";
-  height: 16px;
-  width: 16px;
+  height: 20px;
+  width: 20px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
-  transition: 0.2s;
+  background: #fff;
+  transition: var(--transition-bounce);
   border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
+/* Checked state with gradient glow */
 input:checked + .slider {
-  background-color: #1890ff;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  box-shadow: inset 2px 2px 4px rgba(0,0,0,0.15), inset -1px -1px 2px rgba(255,255,255,0.2),
+              0 0 12px rgba(102, 126, 234, 0.3);
 }
 
-input:checked + .slider:before {
-  transform: translateX(18px);
+input:checked + .slider::before {
+  transform: translateX(20px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
-/* Footer */
+/* Hover glow */
+.switch:hover .slider {
+  box-shadow: inset 2px 2px 4px rgba(0,0,0,0.12), inset -1px -1px 2px rgba(255,255,255,0.6),
+              0 0 8px rgba(102, 126, 234, 0.15);
+}
+
+/* ==================== Footer Buttons ==================== */
+
 .popup-footer {
   display: flex;
   gap: 8px;
   padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .btn {
   flex: 1;
-  padding: 8px 12px;
-  border: 1px solid #d9d9d9;
-  border-radius: 6px;
+  padding: 9px 12px;
+  border: none;
+  border-radius: var(--radius-md);
   font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
   font-family: inherit;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.2px;
 }
 
+/* Primary button — gradient + glass */
 .btn-primary {
-  background: #1890ff;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: #fff;
-  border-color: #1890ff;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
 }
 
 .btn-primary:hover {
-  background: #096dd9;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.45);
 }
 
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+}
+
+/* Primary button shimmer effect */
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.btn-primary:hover::after {
+  transform: translateX(100%);
+}
+
+/* Secondary button — neumorphism */
 .btn-secondary {
-  background: #fff;
-  color: #333;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #5a5a72;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: var(--shadow-card);
 }
 
 .btn-secondary:hover {
-  background: #f5f5f5;
-  border-color: #1890ff;
-  color: #1890ff;
+  color: #667eea;
+  border-color: rgba(102, 126, 234, 0.3);
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-1px);
+  box-shadow: 2px 8px 20px rgba(102, 126, 234, 0.08), -4px -4px 12px #fff;
 }
+
+.btn-secondary:active {
+  transform: translateY(0);
+  box-shadow: inset 2px 2px 4px rgba(0,0,0,0.06), inset -2px -2px 4px #fff;
+}
+
+/* ==================== Staggered Entrance Animation ==================== */
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.stat-card:nth-child(1) { animation: card-enter 0.4s 0.05s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.stat-card:nth-child(2) { animation: card-enter 0.4s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.stat-card:nth-child(3) { animation: card-enter 0.4s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.stat-card:nth-child(4) { animation: card-enter 0.4s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+.toggle-row:nth-child(1) { animation: card-enter 0.35s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.toggle-row:nth-child(2) { animation: card-enter 0.35s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.toggle-row:nth-child(3) { animation: card-enter 0.35s 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both; }

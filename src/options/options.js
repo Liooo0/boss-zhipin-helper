@@ -90,6 +90,7 @@ document.getElementById('resume-file').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
   await parseResume(file);
+  e.target.value = ''; // 清除选择，允许重新上传同一文件
 });
 
 async function parseResume(file) {
@@ -133,10 +134,10 @@ async function parseResume(file) {
     status.textContent = '✅ 解析完成！点击右侧按钮查看结果';
     setTimeout(() => { status.textContent = ''; }, 8000);
   } catch (err) {
-    status.textContent = '❌ 解析失败: ' + (err.message || '未知错误');
+    const errMsg = err.message || '未知错误';
+    status.innerHTML = '<span style="color:#ff4d4f;">❌ 解析失败: ' + errMsg + '</span>'
+      + '<br><small style="color:#999;">💡 请按 F12 打开控制台查看 [Resume] 开头的日志，了解 AI 原始返回内容</small>';
     console.error('Resume parse error:', err);
-  } finally {
-    e.target.value = '';
   }
 }
 
@@ -167,7 +168,9 @@ async function extractPdfText(arrayBuf) {
 }
 
 async function callDeepSeekForResume(resumeText, apiKey, provider = 'deepseek') {
-  const text = resumeText.length > 8000 ? resumeText.substring(0, 8000) : resumeText;
+  // MiMo 上下文窗口可能较小，限制输入长度
+  const maxLen = provider === 'mimo' ? 3000 : 8000;
+  const text = resumeText.length > maxLen ? resumeText.substring(0, maxLen) : resumeText;
 
   const endpoint = provider === 'mimo' ? 'https://api.xiaomimimo.com/v1/chat/completions' : 'https://api.deepseek.com/chat/completions';
   const model = provider === 'mimo' ? 'mimo-v2.5-pro' : 'deepseek-chat';
@@ -178,77 +181,230 @@ async function callDeepSeekForResume(resumeText, apiKey, provider = 'deepseek') 
     body: JSON.stringify({
       model,
       messages: [
-        { role: 'system', content: `你是简历信息提取助手，帮助用户从简历中整理信息。请完整提取所有内容，按章节分类。返回严格JSON（不要markdown代码块）：
+        { role: 'system', content: `你是简历解析器。阅读简历文本，提取信息并输出JSON。只输出JSON，不要解释。` },
+        { role: 'user', content: `简历文本：
+${text}
 
-{
-  "name": "姓名",
-  "phone": "电话",
-  "email": "邮箱",
-  "education": [{ "school": "学校", "major": "专业", "degree": "学历", "time": "时间" }],
-  "experience": [{ "company": "公司", "position": "职位", "time": "时间", "description": "工作内容" }],
-  "projects": [{ "name": "项目名", "role": "角色", "description": "项目描述和技术栈" }],
-  "skills": "所有技能",
-  "certificates": "证书和获奖",
-  "languages": "语言能力",
-  "summary": "个人总结（100字）",
-  "expectedSalary": "期望薪资（如无则空）"
-}
-
-规则：
-- 简历中每个章节的内容都要提取，不要遗漏
-- 数组字段（education/experience/projects）要列出每一条
-- 技能、证书、语言等要合并同类项
-- 找不到的字段填空字符串或空数组` },
-        { role: 'user', content: text },
+请输出以下格式的JSON（找不到的字段填空字符串或空数组）：
+{"name":"","phone":"","email":"","education":[{"school":"","major":"","degree":"","time":""}],"experience":[{"company":"","position":"","time":"","description":""}],"projects":[{"name":"","role":"","description":""}],"skills":"","certificates":"","languages":"","summary":"","expectedSalary":""}` },
       ],
-      temperature: 0.1, max_tokens: 1500,
+      // MiMo 推理模型需要更多 token（推理过程 + 最终输出）
+      temperature: 0.1, max_tokens: provider === 'mimo' ? 4000 : 1500,
     }),
   });
 
-  if (!resp.ok) throw new Error('API请求失败: ' + resp.status);
-  const data = await resp.json();
-  let content = data?.choices?.[0]?.message?.content || '';
-
-  // 尝试从 markdown 代码块中提取
-  const codeMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (codeMatch) content = codeMatch[1];
-
-  // 提取 JSON 对象
-  const jsonMatch = content.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    console.error('[Resume] AI原始返回:', content.substring(0, 200));
-    throw new Error('AI 返回格式异常');
+  if (!resp.ok) {
+    const errText = await resp.text().catch(() => '');
+    throw new Error('API请求失败: HTTP ' + resp.status + (errText ? ' — ' + errText.substring(0, 200) : ''));
   }
+  const data = await resp.json();
+
+  // 诊断：打印完整响应结构（排查 MiMo 是否用了不同的字段名）
+  const msgObj = data?.choices?.[0]?.message || {};
+  console.log('[Resume] API响应结构:', JSON.stringify({
+    hasChoices: !!data?.choices,
+    choicesLen: data?.choices?.length,
+    hasMessage: !!data?.choices?.[0]?.message,
+    msgKeys: Object.keys(msgObj),
+    msgContent: msgObj.content,
+    msgText: msgObj.text,
+    msgReply: msgObj.reply,
+    choiceKeys: Object.keys(data?.choices?.[0] || {}),
+    altFields: Object.keys(data || {}).filter(k => !['choices', 'id', 'object', 'created', 'model'].includes(k)),
+  }));
+
+  // 兼容不同的 API 响应格式
+  // MiMo 是推理模型：content 可能为空，实际输出在 reasoning_content 中
+  const reasoningContent = data?.choices?.[0]?.message?.reasoning_content || '';
+  let content = data?.choices?.[0]?.message?.content
+    || data?.choices?.[0]?.message?.text
+    || data?.choices?.[0]?.message?.reply
+    || data?.choices?.[0]?.text
+    || data?.reply
+    || data?.data?.reply
+    || data?.message
+    || '';
+
+  // MiMo 推理模型特殊处理：content 为空时从 reasoning_content 提取
+  if (!content && reasoningContent) {
+    console.log('[Resume] content为空，从reasoning_content提取（总长' + reasoningContent.length + '）');
+    // reasoning_content 末尾通常包含最终输出，尝试从中提取 JSON
+    // 也记录末尾内容以便排查
+    console.log('[Resume] reasoning_content末尾500字:', reasoningContent.substring(Math.max(0, reasoningContent.length - 500)));
+    content = reasoningContent;
+  }
+
+  console.log('[Resume] 提取到的content(前500字):', content.substring(0, 500));
+  console.log('[Resume] content总长度:', content.length, '是否为空:', !content);
+
+  // 用更健壮的方式提取 JSON（兼容 DeepSeek / MiMo 的各种返回格式）
+  content = _extractJSON(content);
 
   let parsed;
   try {
-    parsed = JSON.parse(jsonMatch[0]);
+    parsed = JSON.parse(content);
   } catch (jsonErr) {
-    // JSON 有语法错误时，尝试修复常见问题
-    console.error('[Resume] JSON解析失败，尝试修复:', jsonErr.message);
-    // 重新请求一次（简化格式）
-    const retryResp = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: '从简历文本提取信息，只返回纯JSON，不要markdown。所有字段用字符串，不要数组。' },
-          { role: 'user', content: text + '\n\n返回格式：{"name":"","phone":"","email":"","skills":"","experience":"","education":"","summary":"","expectedSalary":""}' },
-        ],
-        temperature: 0, max_tokens: 600,
-      }),
-    });
-    if (!retryResp.ok) throw new Error('重试请求失败: ' + retryResp.status);
-    const retryData = await retryResp.json();
-    let retryContent = retryData?.choices?.[0]?.message?.content || '';
-    const retryMatch = retryContent.match(/\{[\s\S]*\}/);
-    if (!retryMatch) throw new Error('重试解析失败');
-    parsed = JSON.parse(retryMatch[0]);
+    // 渐进式 JSON 修复
+    let fixed = content;
+    try {
+      // 修复1: 尾部逗号
+      fixed = content.replace(/,\s*([}\]])/g, '$1');
+      parsed = JSON.parse(fixed);
+    } catch (e1) {
+      try {
+        // 修复2: 字符串内特殊字符转义（单次遍历，避免顺序问题）
+        fixed = content.replace(/,\s*([}\]])/g, '$1');
+        fixed = fixed.replace(/"([^"]*?)"/g, (m) => {
+          const inner = m.slice(1, -1);
+          const escaped = inner.replace(/[\n\r\t\\"]/g, (c) => {
+            switch (c) {
+              case '\n': return '\\n';
+              case '\r': return '\\r';
+              case '\t': return '\\t';
+              case '\\': return '\\\\';
+              case '"': return '\\"';
+              default: return c;
+            }
+          });
+          return '"' + escaped + '"';
+        });
+        parsed = JSON.parse(fixed);
+      } catch (e2) {
+        try {
+          // 修复3: 移除控制字符 + 尝试补全截断的 JSON
+          fixed = fixed.replace(/[\x00-\x1F]/g, ' ').replace(/\s+/g, ' ');
+          // 如果 JSON 被截断（缺 } 或 ]），尝试补全
+          const openBraces = (fixed.match(/\{/g) || []).length;
+          const closeBraces = (fixed.match(/\}/g) || []).length;
+          const openBrackets = (fixed.match(/\[/g) || []).length;
+          const closeBrackets = (fixed.match(/\]/g) || []).length;
+          let repaired = fixed;
+          for (let i = closeBrackets; i < openBrackets; i++) repaired += ']';
+          for (let i = closeBraces; i < openBraces; i++) repaired += '}';
+          // 确保最后一个值是完整的（截断的字符串值补上引号）
+          if (repaired.endsWith('}') || repaired.endsWith(']')) {
+            // already closed, good
+          } else if (!repaired.endsWith('"')) {
+            repaired += '"';
+          }
+          parsed = JSON.parse(repaired);
+        } catch (e3) {
+          console.error('[Resume] JSON解析失败。原始(前300字):', content.substring(0, 300));
+          console.error('[Resume] JSON解析失败。末尾(后300字):', content.substring(Math.max(0, content.length - 300)));
+          throw new Error('AI返回格式异常，请尝试切换模型: ' + content.substring(0, 80) + '...');
+        }
+      }
+    }
   }
 
   parsed.fullText = resumeText;
   return parsed;
+}
+
+/**
+ * 从 AI 返回的文本中提取 JSON 字符串
+ * 兼容 DeepSeek 和 MiMo 模型的各种返回格式
+ */
+function _extractJSON(raw) {
+  // 空内容直接报错
+  if (!raw || !raw.trim()) {
+    throw new Error('AI 返回内容为空（可能是API响应异常或Key无效），请检查API Key是否正确');
+  }
+
+  let content = raw;
+
+  // 策略1: 提取 markdown 代码块（大小写不敏感）
+  const fencePatterns = [
+    /```(?:json|JSON)?\s*\n?([\s\S]*?)```/i,
+    /```\s*\n?(\{[\s\S]*?\})\s*\n?```/,
+    /`([^`]*)`/,
+  ];
+  for (const pattern of fencePatterns) {
+    const match = content.match(pattern);
+    if (match) {
+      const extracted = (match[1] || '').trim();
+      if (extracted.includes('{') && extracted.includes('}')) {
+        content = extracted;
+        break;
+      }
+    }
+  }
+
+  // 策略2: ASCII 花括号 — 找到顶层 JSON 对象
+  const start = content.indexOf('{');
+  const end = content.lastIndexOf('}');
+
+  if (start >= 0 && end > start) {
+    return content.substring(start, end + 1);
+  }
+
+  // 策略3: 全角花括号（MiMo 可能返回 Unicode 全角标点）
+  const fullWidthOpen = content.indexOf('｛');  // ｛
+  const fullWidthClose = content.lastIndexOf('｝'); // ｝
+  if (fullWidthOpen >= 0 && fullWidthClose > fullWidthOpen) {
+    content = content.substring(fullWidthOpen, fullWidthClose + 1);
+    content = content
+      .replace(/｛/g, '{').replace(/｝/g, '}')
+      .replace(/｜/g, ':').replace(/、/g, ',')
+      .replace(/“/g, '"').replace(/”/g, '"');
+    return content;
+  }
+
+  // 策略4: 查找 JSON 关键字段名（即使没有花括号，尝试从自然语言中提取）
+  const jsonKeywords = ['"name"', '"phone"', '"email"', '"skills"', '"education"', '"experience"', '"summary"'];
+  const hasJsonKeywords = jsonKeywords.some(kw => content.includes(kw));
+  if (hasJsonKeywords) {
+    const trimmed = content.trim();
+    if (!trimmed.startsWith('{') && !trimmed.endsWith('}')) {
+      return '{' + trimmed + '}';
+    }
+    if (!trimmed.startsWith('{')) return '{' + trimmed;
+    if (!trimmed.endsWith('}')) return trimmed + '}';
+  }
+
+  // 策略5: 降级 — MiMo 可能完全没输出 JSON，而是以自然语言总结了简历
+  // 检查是否包含中文简历关键词（姓名/电话/邮箱/技能等）
+  const chineseResumeKeys = ['姓名', '电话', '邮箱', '学校', '专业', '技能', '公司', '职位', '项目'];
+  const hasChineseKeys = chineseResumeKeys.some(k => content.includes(k));
+
+  if (hasChineseKeys) {
+    console.warn('[Resume] MiMo返回了自然语言而非JSON，尝试从中文文本中构建结构化数据');
+    // 构建一个最小可用的 resumeData 对象
+    return JSON.stringify({
+      name: _extractField(content, ['姓名[：:]\\s*(\\S+)', '名字[：:]\\s*(\\S+)']),
+      phone: _extractField(content, ['电话[：:]\\s*(\\S+)', '手机[：:]\\s*(\\S+)', '联系方式[：:]\\s*(\\S+)']),
+      email: _extractField(content, ['邮箱[：:]\\s*(\\S+)', 'Email[：:]\\s*(\\S+)', '邮件[：:]\\s*(\\S+)']),
+      education: [],
+      experience: [],
+      projects: [],
+      skills: _extractField(content, ['技能[：:]\\s*(\\S+)', '技术栈[：:]\\s*(\\S+)', '擅长[：:]\\s*(\\S+)']),
+      certificates: '',
+      languages: '',
+      summary: '',
+      expectedSalary: '',
+    });
+  }
+
+  // 所有策略均失败
+  console.error('[Resume] 所有提取策略失败。原始返回:', raw);
+  throw new Error('AI 返回不含JSON: ' + raw.substring(0, 100) + (raw.length > 100 ? '...' : ''));
+}
+
+/**
+ * 从中文文本中用正则提取字段值
+ * @param {string} text 原始文本
+ * @param {string[]} patterns 正则模式（应包含一个捕获组）
+ */
+function _extractField(text, patterns) {
+  for (const pattern of patterns) {
+    try {
+      const m = text.match(new RegExp(pattern, 'i'));
+      if (m) return (m[1] || '').trim().substring(0, 100);
+    } catch {
+      // 正则无效则跳过
+    }
+  }
+  return '';
 }
 
 function showResumeModal(data) {
@@ -258,8 +414,6 @@ function showResumeModal(data) {
   // 分离 fullText，不放入 JSON 编辑器
   const { fullText = '', ...structuredData } = data;
   const jsonStr = JSON.stringify(structuredData, null, 2);
-  const shortText = (fullText || '').substring(0, 500);
-
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
   modal.innerHTML = `
@@ -269,7 +423,7 @@ function showResumeModal(data) {
       <label style="font-weight:600;font-size:13px;">📊 结构化数据（可编辑）</label>
       <textarea id="resume-json-editor" style="width:100%;height:220px;font-family:Consolas,monospace;font-size:12px;padding:10px;border:1px solid #d9d9d9;border-radius:6px;resize:vertical;">${jsonStr}</textarea>
       <label style="font-weight:600;font-size:13px;margin-top:12px;display:block;">📝 PDF 原始文本（仅供参考，共${(fullText || '').length}字）</label>
-      <textarea readonly style="width:100%;height:150px;font-size:11px;padding:8px;border:1px solid #e8e8e8;border-radius:6px;background:#f9f9f9;color:#666;resize:vertical;">${shortText}...</textarea>
+      <textarea readonly id="resume-full-text" style="width:100%;height:200px;font-size:11px;padding:8px;border:1px solid #e8e8e8;border-radius:6px;background:#f9f9f9;color:#666;resize:vertical;">${(fullText || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
       <div class="modal-footer" style="margin-top:12px;">
         <button class="btn" id="modal-cancel-resume">取消</button>
         <button class="btn btn-primary" id="modal-save-resume">💾 保存</button>

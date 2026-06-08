@@ -1,6 +1,6 @@
 # BOSS 直聘助手
 
-一个 Chrome 浏览器扩展，帮助在 BOSS 直聘上整理求职信息。
+一个 Chrome 浏览器扩展，帮助在 BOSS 直聘 / 智联招聘上整理求职信息。
 
 ## 功能
 
@@ -12,13 +12,14 @@
 - **右键发送** — 聊天页面右键 HR 消息直接发送到 AI 助手
 - **双模式回复** — 专业模式/拟人模式自由切换
 - **双模型支持** — DeepSeek / MiMo 2.5
+- **多平台适配** — BOSS直聘 (boss.cn / zhipin.com) + 智联招聘 (zhaopin.com)
 
 ## 安装
 
 1. 下载代码，解压
 2. Chrome 地址栏输入 `chrome://extensions`，开启「开发者模式」
 3. 点击「加载已解压的扩展程序」，选择项目文件夹
-4. 打开 BOSS 直聘即可使用
+4. 打开 BOSS 直聘或智联招聘即可使用
 
 > 注意：`icons/` 目录下需要 icon16.png、icon48.png、icon128.png 三个图标文件
 
@@ -31,9 +32,22 @@
 - 选择回复风格（专业/拟人）
 - 上传 PDF 简历（可选）
 
+> **MiMo 2.5 用户注意**：MiMo 为推理模型，API 响应结构与 DeepSeek 略有差异。本扩展已做兼容处理（reasoning_content 回退、max_tokens 自动调整），直接使用即可。
+
 ## 数据存储
 
 所有数据存储在浏览器本地（IndexedDB + chrome.storage.local），不上传任何服务器。
+
+## 更新日志
+
+### v1.0.1
+- 修复 MiMo 模型 PDF 简历解析失败问题（兼容 reasoning_content 字段、增大 token 配额）
+- 修复 PDF 原始文本显示不全
+- 增强 JSON 提取容错（全角字符、markdown 代码块、截断修复）
+- 完善控制台诊断日志
+
+### v1.0.0
+- 初始版本发布
 
 ## 免责声明
 
