@@ -597,7 +597,9 @@ export class AIReplyAssistant {
     const model = provider === 'mimo' ? 'mimo-v2.5-pro' : 'deepseek-chat';
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), AI_TIMEOUT);
+    // MiMo 推理模型需要更长时间（推理+生成两步），DeepSeek 15s 足够
+    const timeoutMs = provider === 'mimo' ? 45000 : AI_TIMEOUT;
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
       const resp = await fetch(endpoint, {
@@ -609,7 +611,7 @@ export class AIReplyAssistant {
             { role: 'system', content: this._sysPrompt() },
             { role: 'user', content: this._userPrompt(userMessage) },
           ],
-          temperature: 0.7, max_tokens: 400,
+          temperature: 0.7, max_tokens: provider === 'mimo' ? 800 : 400,
         }),
         signal: controller.signal,
       });
@@ -620,7 +622,14 @@ export class AIReplyAssistant {
       }
 
       const data = await resp.json();
-      return data?.choices?.[0]?.message?.content || '(空)';
+      // MiMo 推理模型：content 可能为空，实际输出在 reasoning_content
+      const msg = data?.choices?.[0]?.message || {};
+      let content = msg.content || msg.reasoning_content || '';
+      if (!content && provider === 'mimo') {
+        // 兼容其他可能的字段名
+        content = msg.text || msg.reply || '';
+      }
+      return content || '(空)';
     } finally {
       clearTimeout(timeout);
     }
@@ -631,12 +640,21 @@ export class AIReplyAssistant {
    */
   async _autoGenerateGreeting() {
     if (!this.selectedJob?.description) return;
-    window.__bhDebug?.('log', '🤖 自动生成招呼语...');
+    if (this.isLoading) return; // 防止重复点击
 
     const provider = this.userSettings.aiProvider || 'deepseek';
     const apiKey = provider === 'mimo' ? this.userSettings.mimoApiKey : this.userSettings.deepseekApiKey;
-    if (!apiKey) return;
+    if (!apiKey) {
+      window.__bhDebug?.('error', '未配置 ' + (provider === 'mimo' ? 'MIMO' : 'DeepSeek') + ' API Key');
+      return;
+    }
 
+    this.isLoading = true;
+    const root = this.shadowRoot;
+    const greetBtn = root.getElementById('bh-ai-greet');
+    if (greetBtn) { greetBtn.disabled = true; greetBtn.textContent = '⏳ ...'; }
+
+    window.__bhDebug?.('log', '🤖 自动生成招呼语...');
     const text = '请为这个岗位生成一个打招呼语';
     this._lastUserInput = text;
     try {
@@ -647,6 +665,9 @@ export class AIReplyAssistant {
       window.__bhDebug?.('log', '✅ 招呼语已生成(' + reply.length + '字)');
     } catch (err) {
       window.__bhDebug?.('error', '招呼语生成失败: ' + (err.message || err));
+    } finally {
+      this.isLoading = false;
+      if (greetBtn) { greetBtn.disabled = false; greetBtn.textContent = '👋 打招呼'; }
     }
   }
 
