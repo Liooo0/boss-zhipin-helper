@@ -72,7 +72,7 @@
 
 1. 下载代码
 ```bash
-git clone https://github.com/ConsoleSun/boss-zhipin-helper.git
+git clone https://github.com/Liooo0/boss-zhipin-helper.git
 ```
 
 2. Chrome 地址栏输入 `chrome://extensions`，开启「开发者模式」
